@@ -37,7 +37,8 @@ RSpec.describe StrictJson do
       "an empty body" => "",
       "duplicate keys" => '{"a":1,"a":2}',
       "NaN" => "[NaN]",
-      "a trailing comma" => "[1,]"
+      "a trailing comma" => "[1,]",
+      "a lone surrogate, which is not valid Unicode" => '["\ud800"]'
     }.each do |description, source|
       it "rejects #{description}" do
         expect { described_class.parse(source) }.to raise_error(described_class::ParseError, "is not valid JSON")

@@ -45,13 +45,24 @@ RSpec.describe "Encryption", type: :request do
       end
     end
 
-    [ "text/plain", "application/x-www-form-urlencoded", nil ].each do |content_type|
+    [ "text/plain", "application/x-www-form-urlencoded" ].each do |content_type|
       it "rejects the Content-Type #{content_type.inspect} with 415", :aggregate_failures do
         post_json "/encrypt", '{"name":"John Doe"}', content_type: content_type
 
         expect(response).to have_http_status(:unsupported_media_type)
         expect(error).to eq("code" => "unsupported_media_type", "message" => "Content-Type must be application/json")
       end
+    end
+
+    it "rejects a request without Content-Type with 415", :aggregate_failures do
+      # rack-test always adds a form Content-Type to a POST, so the app is called directly.
+      env = Rack::MockRequest.env_for("/encrypt", method: "POST", input: '{"name":"John Doe"}')
+      expect(env).not_to have_key("CONTENT_TYPE")
+
+      raw_response = Rack::MockResponse.new(*Rails.application.call(env))
+
+      expect(raw_response.status).to eq(415)
+      expect(JSON.parse(raw_response.body).dig("error", "code")).to eq("unsupported_media_type")
     end
 
     {
