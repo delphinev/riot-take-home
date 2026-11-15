@@ -6,7 +6,7 @@ The challenge statement is in [docs/INSTRUCTIONS.md](docs/INSTRUCTIONS.md).
 
 ## Getting started
 
-Requires Ruby 3.4.2 (see `.ruby-version`). No database and no environment variable are needed locally.
+Requires Ruby 3.4.12 (see `.ruby-version`). No database and no environment variable are needed locally.
 
 ```bash
 bundle install
