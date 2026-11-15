@@ -1,6 +1,14 @@
 require "rails_helper"
 
 RSpec.describe StrictJson do
+  describe ".generate" do
+    it "writes values nested deeper than the json gem's default limit of 100" do
+      deep = 150.times.reduce(1) { |value, _| [ value ] }
+
+      expect(described_class.generate(deep)).to eq(("[" * 150) + "1" + ("]" * 150))
+    end
+  end
+
   describe ".parse" do
     it "parses an object" do
       expect(described_class.parse('{"name":"John Doe","age":30}')).to eq("name" => "John Doe", "age" => 30)

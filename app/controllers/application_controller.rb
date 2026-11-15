@@ -17,7 +17,12 @@ class ApplicationController < ActionController::API
     @json_body ||= StrictJson.parse(request.raw_post)
   end
 
+  # Written by StrictJson, which can write back whatever it parsed.
+  def render_json(value, status: :ok)
+    render status:, json: StrictJson.generate(value)
+  end
+
   def render_error(status, code, message)
-    render status:, json: { error: { code:, message: } }
+    render_json({ error: { code:, message: } }, status:)
   end
 end

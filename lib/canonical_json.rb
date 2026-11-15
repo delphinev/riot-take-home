@@ -2,7 +2,7 @@
 # signature does not change with the order of the keys.
 module CanonicalJson
   def self.generate(value)
-    JSON.generate(normalize(value))
+    StrictJson.generate(normalize(value))
   end
 
   def self.normalize(value)

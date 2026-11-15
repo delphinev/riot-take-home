@@ -8,10 +8,10 @@ class EncryptionController < ApplicationController
   end
 
   def encrypt
-    render json: Crypto.payload_encryptor.encrypt(json_body)
+    render_json Crypto.payload_encryptor.encrypt(json_body)
   end
 
   def decrypt
-    render json: Crypto.payload_encryptor.decrypt(json_body)
+    render_json Crypto.payload_encryptor.decrypt(json_body)
   end
 end

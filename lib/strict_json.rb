@@ -1,7 +1,14 @@
-# Parses JSON sent by clients (request bodies, decrypted values) and rejects
-# what the json gem accepts but the API could not return or sign reliably.
+# Reads and writes the JSON exchanged with clients. Parsing (request bodies,
+# decrypted values) rejects what the json gem accepts but the API could not
+# return or sign reliably.
 module StrictJson
   class ParseError < StandardError; end
+
+  # The parser already bounds nesting, so the generator's own limit is lifted:
+  # whatever was accepted can be written back, even one level deeper in a /decrypt response.
+  def self.generate(value)
+    JSON.generate(value, max_nesting: false)
+  end
 
   def self.parse(source)
     # The parser accepts invalid UTF-8 silently; it would only fail when the value is written back.

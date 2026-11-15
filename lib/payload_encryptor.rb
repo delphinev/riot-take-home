@@ -15,7 +15,7 @@ class PayloadEncryptor
     ensure_object!(payload)
 
     # Values are serialized first, so that their type (30, true, nested objects) survives the round trip.
-    payload.transform_values { |value| @prefix + @encryptor.encrypt(JSON.generate(value)) }
+    payload.transform_values { |value| @prefix + @encryptor.encrypt(StrictJson.generate(value)) }
   end
 
   def decrypt(payload)
