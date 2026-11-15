@@ -14,6 +14,12 @@ RSpec.describe PayloadSigner do
     it "signs any JSON value" do
       expect([ [ 1, 2 ], "text", nil ].map { payload_signer.sign(it) }.uniq.size).to eq(3)
     end
+
+    it "gives different signatures to values that only look alike", :aggregate_failures do
+      expect(payload_signer.sign("a" => "1")).not_to eq(payload_signer.sign("a" => 1))
+      expect(payload_signer.sign("a" => nil)).not_to eq(payload_signer.sign({}))
+      expect(payload_signer.sign([ 1, 2 ])).not_to eq(payload_signer.sign([ 2, 1 ]))
+    end
   end
 
   describe "#verify" do
