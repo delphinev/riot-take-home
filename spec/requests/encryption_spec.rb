@@ -77,4 +77,55 @@ RSpec.describe "Encryption", type: :request do
       end
     end
   end
+
+  describe "POST /decrypt" do
+    let(:encrypted) do
+      {
+        "name" => "enc:base64:IkpvaG4gRG9lIg==",
+        "age" => "enc:base64:MzA=",
+        "contact" => "enc:base64:eyJlbWFpbCI6ImpvaG5AZXhhbXBsZS5jb20iLCJwaG9uZSI6IjEyMy00NTYtNzg5MCJ9"
+      }
+    end
+
+    let(:original) do
+      {
+        "name" => "John Doe",
+        "age" => 30,
+        "contact" => { "email" => "john@example.com", "phone" => "123-456-7890" }
+      }
+    end
+
+    it "restores the original payload, as in the challenge example", :aggregate_failures do
+      post_json "/decrypt", encrypted.to_json
+
+      expect(response).to have_http_status(:ok)
+      expect(response.parsed_body).to eq(original)
+    end
+
+    it "leaves unencrypted values unchanged, as in the challenge example" do
+      post_json "/decrypt", encrypted.merge("birth_date" => "1998-11-19").to_json
+
+      expect(response.parsed_body).to eq(original.merge("birth_date" => "1998-11-19"))
+    end
+
+    it "rejects a prefixed value that cannot be decrypted with 400", :aggregate_failures do
+      post_json "/decrypt", '{"name":"enc:base64:not base64!"}'
+
+      expect(response).to have_http_status(:bad_request)
+      expect(error).to eq("code" => "corrupted_value", "message" => 'value of "name" cannot be decrypted')
+    end
+
+    it "rejects a body that is not an object with 400", :aggregate_failures do
+      post_json "/decrypt", "[1,2]"
+
+      expect(response).to have_http_status(:bad_request)
+      expect(error).to eq("code" => "invalid_payload", "message" => "request body must be a JSON object")
+    end
+
+    it "requires a JSON Content-Type, like every endpoint" do
+      post_json "/decrypt", encrypted.to_json, content_type: "text/plain"
+
+      expect(response).to have_http_status(:unsupported_media_type)
+    end
+  end
 end
