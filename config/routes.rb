@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   post "encrypt" => "encryption#encrypt"
   post "decrypt" => "encryption#decrypt"
   post "sign" => "signature#sign"
+  post "verify" => "signature#verify"
 
   # Defines the root path route ("/")
   # root "posts#index"
